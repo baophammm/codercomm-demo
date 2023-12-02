@@ -1,46 +1,59 @@
-# Getting Started with Create React App and Redux
+# CoderComm Demo
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+## Requirements
 
-## Available Scripts
+### Authentication
 
-In the project directory, you can run:
+- [ ] User have to log in with email and password
+- [ ] New User can register for a new account with name, email, password
+- [ ] User stay logged in with refreshing page.
 
-### `npm start`
+### User Profile
+- [ ] On the left side of the homepage, User can see his/her profile info including scorecards of number of friends and posts.
+- [ ] On the profile cover, User can switch tabs between Profile, Friends, Requests, Add Friend.
+- [ ] User can update profile info.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Posts and Comments
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- [ ] User can create a new post with a content and an image. the image is optional. User can see the new post after successfully created.
+- [ ] After logged, in, User can see a homepage with his/her posts and his/her friends post. New post should be on the top. User can click load more to see more post. If there is no more post, Load More button should be disabled.
+- [ ] User can comment on a post. User can see the comment after successfully created.
 
-### `npm test`
+### Reaction
+- [ ] User can like/dislike a post or a comment
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Add Friends
+- [ ] User can see a table of all users in the system
+- [ ] User can find users by name
+- [ ] User can see the friendship status with all users and take actions:
+  - [ ] User can send request to other users
+  - [ ] User can cancel a sent request
+  - [ ] User can accept/decline a friend request
+  - [ ] User can unfriend a target user
 
-### `npm run build`
+### Friend Lists
+- [ ] User can see a list of friends. User can find friends by name
+- [ ] User can unfriend
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Friend Request Lists
+- [ ] User can see a list of friend requests. User can find friend requests by name
+- [ ] USer can accept/decline friend requests.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Target User Profile
+- [ ] User can see the profile of other users
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Create Project
 
-### `npm run eject`
+```
+npx create-react-app codercomm-demo --template redux
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Install libraries
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+npm install @mui/material @emotion/react @emotion/styled
+npm install @mui/icons-material @mui/lab
+npm install react-router-dom@6 react-hook-form @hookform/resolvers yup
+npm install axios numeral lodash jwt-decode change-case
+npm install react-markdown rehype-raw date-fns react-dropzone react-toastify
+```
