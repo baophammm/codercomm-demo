@@ -15,3 +15,16 @@ apiService.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+apiService.interceptors.response.use(
+  response => {
+    console.log('Response', response);
+    return response.data;
+  },
+  function (error) {
+    console.log('RESPONSE ERROR', { error });
+    return Promise.reject(error);
+  }
+);
+
+export default apiService;
