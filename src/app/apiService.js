@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { BASE_URL } from './config';
 
-const apiService = axiost.create({
+const apiService = axios.create({
   baseURL: BASE_URL,
 });
 
@@ -23,7 +23,8 @@ apiService.interceptors.response.use(
   },
   function (error) {
     console.log('RESPONSE ERROR', { error });
-    return Promise.reject(error);
+    const message = error.response?.data?.errors?.message || 'Unknown Error';
+    return Promise.reject({ message });
   }
 );
 
