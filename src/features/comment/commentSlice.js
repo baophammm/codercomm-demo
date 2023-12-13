@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import apiService from '../../app/apiService';
 import { COMMENTS_PER_POST } from '../../app/config';
+import { toast } from 'react-toastify';
 
 const initialState = {
   isLoading: false,
@@ -47,6 +48,20 @@ const slice = createSlice({
       const { commentId, reactions } = action.payload;
       state.commentsById[commentId].reactions = reactions;
     },
+
+    deleteCommentSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
+
+      const commentId = action.payload;
+      const postId = state.commentsById[commentId].post;
+      delete state.commentsById[commentId];
+
+      const index = state.commentsByPost[postId].indexOf(commentId);
+      if (index > -1) {
+        state.commentsByPost[postId].splice(index, 1);
+      }
+    },
   },
 });
 
@@ -65,6 +80,7 @@ export const createComment =
       dispatch(getComments({ postId }));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
     }
   };
 
@@ -86,6 +102,7 @@ export const getComments =
       );
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
     }
   };
 
@@ -107,5 +124,20 @@ export const sendCommentReaction =
       );
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
+    }
+  };
+
+export const deleteComment =
+  ({ commentId, postId }) =>
+  async dispatch => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const response = await apiService.delete(`comments/${commentId}`);
+      dispatch(slice.actions.deleteCommentSuccess(commentId));
+      toast.success('Comment deleted');
+    } catch (error) {
+      dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
     }
   };

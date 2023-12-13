@@ -1,6 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import apiService from '../../app/apiService';
 import { POST_PER_PAGE } from '../../app/config';
+import { toast } from 'react-toastify';
+import { cloudinaryUpload } from '../../utils/cloudinary';
 
 const initialState = {
   isLoading: false,
@@ -46,6 +48,31 @@ const slice = createSlice({
       const { postId, reactions } = action.payload;
       state.postsById[postId].reactions = reactions;
     },
+    resetPosts(state, action) {
+      state.postsById = {};
+      state.currentPagePosts = [];
+    },
+    deletePostSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
+      const postId = action.payload;
+
+      delete state.postsById.postId;
+      const index = state.currentPagePosts.indexOf(postId);
+      if (index > -1) {
+        state.currentPagePosts.splice(index, 1);
+      }
+    },
+    editPostSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
+      const { postId, newPost } = action.payload;
+      state.postsById[postId] = {
+        ...state.postsById[postId],
+        content: newPost.content,
+        image: newPost.image,
+      };
+    },
   },
 });
 
@@ -54,13 +81,16 @@ export const createPost =
   async dispatch => {
     dispatch(slice.actions.startLoading());
     try {
+      // upload image to cloudinary
+      const imageUrl = await cloudinaryUpload(image);
       const response = await apiService.post('/posts', {
         content,
-        image,
+        image: imageUrl,
       });
       dispatch(slice.actions.createPostSuccess(response.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
     }
   };
 
@@ -74,9 +104,12 @@ export const getPosts =
         params,
       });
 
+      if (page === 1) dispatch(slice.actions.resetPosts());
+
       dispatch(slice.actions.getPostSuccess(response.data));
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
     }
   };
 
@@ -98,6 +131,39 @@ export const sendPostReaction =
       );
     } catch (error) {
       dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
+    }
+  };
+
+export const deletePost = postId => async dispatch => {
+  dispatch(slice.actions.startLoading());
+  try {
+    const response = await apiService.delete(`posts/${postId}`);
+    dispatch(slice.actions.deletePostSuccess(postId));
+    toast.success('Post deleted');
+  } catch (error) {
+    dispatch(slice.actions.hasError(error.message));
+    toast.error(error.message);
+  }
+};
+
+export const editPost =
+  ({ postId, content, image }) =>
+  async dispatch => {
+    dispatch(slice.actions.startLoading());
+    try {
+      // upload image to cloudinary
+      const imageUrl = await cloudinaryUpload(image);
+      const response = await apiService.put(`/posts/${postId}`, {
+        content,
+        image: imageUrl,
+      });
+      dispatch(
+        slice.actions.editPostSuccess({ postId, newPost: response.data })
+      );
+    } catch (error) {
+      dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
     }
   };
 

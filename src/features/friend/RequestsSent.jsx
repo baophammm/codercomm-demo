@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUsers } from './friendSlice';
+import { getMySentRequests } from './friendSlice';
 import {
   Box,
   Card,
@@ -11,7 +11,8 @@ import {
 } from '@mui/material';
 import SearchInput from '../../components/SearchInput';
 import UserTable from './UserTable';
-function AddFriend() {
+
+function RequestsSent() {
   const [filterName, setFilterName] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -36,14 +37,16 @@ function AddFriend() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  useEffect(() => {
-    dispatch(getUsers({ filterName, page: page + 1, limit: rowsPerPage }));
-  }, [filterName, page, rowsPerPage, dispatch]);
 
+  useEffect(() => {
+    dispatch(
+      getMySentRequests({ filterName, page: page + 1, limit: rowsPerPage })
+    );
+  }, [filterName, page, rowsPerPage, dispatch]);
   return (
     <Container>
       <Typography variant="h4" sx={{ mb: 3 }}>
-        Add Friends
+        Requests Sent
       </Typography>
       <Card sx={{ p: 3 }}>
         <Stack spacing={2}>
@@ -83,4 +86,4 @@ function AddFriend() {
   );
 }
 
-export default AddFriend;
+export default RequestsSent;

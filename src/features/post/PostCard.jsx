@@ -1,21 +1,100 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Avatar,
   Box,
   Card,
   CardHeader,
+  Divider,
   IconButton,
   Link,
+  Menu,
+  MenuItem,
   Stack,
   Typography,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { fDate } from '../../utils/formatTime';
 import PostReaction from './PostReaction';
 import CommentList from '../comment/CommentList';
 import CommentForm from '../comment/CommentForm';
+import useAuth from '../../hooks/useAuth';
+import { useDispatch, useSelector } from 'react-redux';
+import { deletePost, getPosts } from './postSlice';
+import LoadingScreen from '../../components/LoadingScreen';
+import PostEditForm from './PostEditForm';
+
 function PostCard({ post }) {
+  const { user } = useAuth();
+  const currentUserId = user._id;
+  const postUserId = post?.author?._id;
+
+  const { isLoading } = useSelector(state => state.post);
+  const dispatch = useDispatch();
+
+  const handleDeletePost = postId => {
+    const result = window.confirm('Want to delete this post?');
+    if (result) {
+      dispatch(deletePost(postId));
+    }
+  };
+
+  const [currentEditedPostId, setCurrentEditedPost] = useState(null);
+
+  const handleEditPost = postId => {
+    setCurrentEditedPost(postId);
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleProfileMenuOpen = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const renderPostMenu = (
+    <Menu
+      id="menu-appbar"
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={Boolean(anchorEl)}
+      onClose={handleMenuClose}
+      MenuListProps={{
+        'aria-labelledby': 'basic-button',
+      }}
+    >
+      <MenuItem onClick={handleMenuClose} sx={{ mx: 1 }}>
+        <Box
+          onClick={() => handleDeletePost(post._id)}
+          sx={{ width: 1, height: 1, textAlign: 'center' }}
+        >
+          Delete Post
+        </Box>
+      </MenuItem>
+      <MenuItem onClick={handleMenuClose} sx={{ mx: 1 }}>
+        <Box
+          onClick={() =>
+            handleEditPost(post._id, 'updated text', 'updated image')
+          }
+          sx={{ width: 1, height: 1, textAlign: 'center' }}
+        >
+          Edit Post
+        </Box>
+      </MenuItem>
+    </Menu>
+  );
+
   return (
     <Card>
       <CardHeader
@@ -43,25 +122,47 @@ function PostCard({ post }) {
           </Typography>
         }
         action={
-          <IconButton>
-            <MoreVertIcon sx={{ fontSize: 30 }} />
-          </IconButton>
+          currentUserId === postUserId ? (
+            <>
+              <IconButton onClick={handleProfileMenuOpen}>
+                <MoreVertIcon sx={{ fontSize: 30 }} />
+              </IconButton>
+              {renderPostMenu}
+            </>
+          ) : (
+            <></>
+          )
         }
       />
 
       <Stack spacing={2} sx={{ p: 3 }}>
-        <Typography>{post.content}</Typography>
-        {post.image && (
-          <Box
-            sx={{
-              borderRadius: 2,
-              overflow: 'hidden',
-              height: 300,
-              '& img': { objectFit: 'cover', width: 1, height: 1 },
-            }}
-          >
-            <img src={post.image} alt="post"></img>
-          </Box>
+        {currentEditedPostId === post._id ? (
+          <PostEditForm
+            post={post}
+            setCurrentEditedPost={setCurrentEditedPost}
+          />
+        ) : (
+          <>
+            {isLoading ? (
+              <LoadingScreen />
+            ) : (
+              <>
+                <Typography>{post.content}</Typography>
+                {post.image && (
+                  <Box
+                    sx={{
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      height: 300,
+                      '& img': { objectFit: 'cover', width: 1, height: 1 },
+                    }}
+                  >
+                    <img src={post.image} alt="post"></img>
+                  </Box>
+                )}
+              </>
+            )}
+          </>
         )}
 
         <PostReaction post={post} />

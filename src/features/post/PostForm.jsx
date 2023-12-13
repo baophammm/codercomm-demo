@@ -1,5 +1,5 @@
-import React from 'react';
-import { FormProvider, FTextField } from '../../components/form';
+import React, { useCallback } from 'react';
+import { FormProvider, FTextField, FUploadImage } from '../../components/form';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
@@ -37,6 +37,22 @@ function PostForm() {
     dispatch(createPost(data)).then(() => reset());
   };
 
+  const handleDrop = useCallback(
+    acceptedFiles => {
+      const file = acceptedFiles[0];
+
+      if (file) {
+        setValue(
+          'image',
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          })
+        );
+      }
+    },
+    [setValue]
+  );
+
   return (
     <Card sx={{ p: 3 }}>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -54,7 +70,15 @@ function PostForm() {
               },
             }}
           />
-          <FTextField name="image" placeholder="Image" />
+          {/* <FTextField name="image" placeholder="Image" /> */}
+          {/* <input type="file" ref={fileInput} onChange={handleFile} /> */}
+
+          <FUploadImage
+            name="image"
+            accept="image/*"
+            maxSize={3145728}
+            onDrop={handleDrop}
+          />
           <Box
             sx={{
               display: 'flex',

@@ -1,6 +1,5 @@
-import React from 'react';
-import useAuth from '../hooks/useAuth';
 import { Navigate, useLocation } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 import LoadingScreen from '../components/LoadingScreen';
 
 function AuthRequire({ children }) {
@@ -14,6 +13,7 @@ function AuthRequire({ children }) {
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+
   return children;
 }
 
