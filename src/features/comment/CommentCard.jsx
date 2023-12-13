@@ -11,22 +11,32 @@ import React, { useEffect } from 'react';
 import { fDate } from '../../utils/formatTime';
 import CommentReaction from './CommentReaction';
 import useAuth from '../../hooks/useAuth';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { deleteComment, getComments } from './commentSlice';
+import { COMMENTS_PER_POST } from '../../app/config';
 
 function CommentCard({ comment }) {
   const { user } = useAuth();
+  const dispatch = useDispatch();
+  const { commentsByPost, currentPageByPost, totalCommentsByPost } =
+    useSelector(state => state.comment);
+
   const currentUserId = user._id;
   const commentUserId = comment?.author?._id;
   const commentId = comment._id;
   const postId = comment.post;
 
-  const dispatch = useDispatch();
-
   const handleDeleteComment = () => {
     const result = window.confirm('Want to delete this comment?');
     if (result) {
-      dispatch(deleteComment({ commentId, postId }));
+      const numberOfComments = commentsByPost[postId].length;
+      const page =
+        numberOfComments <= 1
+          ? currentPageByPost[postId] - 1
+          : currentPageByPost[postId];
+      dispatch(deleteComment({ commentId, postId })).then(() => {
+        dispatch(getComments({ postId, page }));
+      });
     }
   };
 
